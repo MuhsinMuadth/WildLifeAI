@@ -184,7 +184,7 @@ window.WildlifeAI.UIManager.setupUIHandlers = function() {
 };
 
 // ===================================
-// RESULTS DISPLAY - SINGLE IMAGE
+// RESULTS DISPLAY 
 // ===================================
 window.WildlifeAI.UIManager.displayResults = function(results) {
     const classificationsHTML = `
@@ -201,9 +201,30 @@ window.WildlifeAI.UIManager.displayResults = function(results) {
                 ${window.WildlifeAI.Utils.formatClassificationText(results.size)}<br>
                 ${window.WildlifeAI.Utils.formatClassificationText(results.mammal)}
             </div>
-            <div style="text-align: center; margin-top: 15px; font-size: 0.9rem; color: #666;">
-                🎯 Thresholds: "Could be" (0-60%) | "Is likely" (60-80%) | "Is" (80%+)<br>
-                <span class="label-positive">Green: Positive Cases</span> | <span class="label-negative">Orange: Negative Cases</span>
+            
+            <!-- ✨ FIXED: Color-coded confidence levels in neutral purple box -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
+                <!-- Confidence Thresholds Info - Purple theme with color-coded levels -->
+                <div style="background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%); border: 2px solid #d8b4fe; border-radius: 12px; padding: 15px; text-align: center;">
+                    <div style="font-weight: 700; color: #7c3aed; margin-bottom: 8px; font-size: 0.95rem;">
+                        🎯 Confidence Levels
+                    </div>
+                    <div style="font-size: 0.85rem; line-height: 1.4;">
+                        <span style="background: #d4edda; color: #155724; padding: 2px 6px; border-radius: 4px; font-weight: 600;">High (80%+)</span> • 
+                        <span style="background: #d1ecf1; color: #0c5460; padding: 2px 6px; border-radius: 4px; font-weight: 600;">Medium (60-80%)</span> • 
+                        <span style="background: #fff3cd; color: #856404; padding: 2px 6px; border-radius: 4px; font-weight: 600;">Low (<60%)</span>
+                    </div>
+                </div>
+                
+                <!-- Color Legend Info - Gray theme (neutral) -->
+                <div style="background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%); border: 2px solid #d1d5db; border-radius: 12px; padding: 15px; text-align: center;">
+                    <div style="font-weight: 700; color: #374151; margin-bottom: 8px; font-size: 0.95rem;">
+                        🎨 Color Legend
+                    </div>
+                    <div style="font-size: 0.85rem; line-height: 1.4;">
+                        <span class="label-positive" style="font-size: 0.85rem;">Green: Positive Cases</span> • <span class="label-negative" style="font-size: 0.85rem;">Orange: Negative Cases</span>
+                    </div>
+                </div>
             </div>
         </div>
     `;
@@ -217,11 +238,32 @@ window.WildlifeAI.UIManager.displayResults = function(results) {
     }
 };
 
+// ===================================
+// CLASSIFICATION CARD 
+// ===================================
 function createClassificationCard(title, result, icon) {
     const level = window.WildlifeAI.Utils.getConfidenceLevel(result.confidence);
     const percentage = Math.round(result.confidence * 100);
     const labelColorClass = window.WildlifeAI.Utils.getLabelColorClass(result.label);
     const oppositeLabelColorClass = window.WildlifeAI.Utils.getLabelColorClass(result.opposite);
+    
+    // Same colors as batch page
+    let confidenceBadgeStyle = '';
+    let levelBadgeStyle = '';
+    
+    if (level === 'is') {
+        // High confidence - Green
+        confidenceBadgeStyle = 'background: #d4edda; color: #155724; border: 1px solid #c3e6cb;';
+        levelBadgeStyle = 'background: #d4edda; color: #155724;';
+    } else if (level === 'likely') {
+        // Medium confidence - Blue
+        confidenceBadgeStyle = 'background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb;';
+        levelBadgeStyle = 'background: #d1ecf1; color: #0c5460;';
+    } else {
+        // Low confidence - Orange/Yellow
+        confidenceBadgeStyle = 'background: #fff3cd; color: #856404; border: 1px solid #ffeaa7;';
+        levelBadgeStyle = 'background: #fff3cd; color: #856404;';
+    }
     
     return `
         <div class="classification-card">
@@ -230,10 +272,9 @@ function createClassificationCard(title, result, icon) {
                 <div class="confidence-fill" style="width: ${percentage}%"></div>
             </div>
             <div class="confidence-text">
-                Subject ${level === 'is' ? 'is' : level === 'likely' ? 'is likely' : 'could be'} <span class="${labelColorClass}">${result.label}</span> (${percentage}%)
-                <span class="status-indicator ${window.WildlifeAI.Utils.getStatusClass(level)}">
-                    ${level.toUpperCase()}
-                </span>
+                <!-- ✨ PERFECT TEXT FLOW: Natural reading order with color coding -->
+                Subject <span style="${levelBadgeStyle} padding: 2px 6px; border-radius: 4px; font-weight: 700; text-transform: uppercase;">${level}</span> <span class="${labelColorClass}">${result.label}</span> 
+                (<span style="${confidenceBadgeStyle} padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 1rem;">${percentage}%</span>)
             </div>
             <div style="font-size: 0.85rem; color: #666; margin-top: 8px; text-align: center;">
                 Alternative: <span class="${oppositeLabelColorClass}">${result.opposite}</span> (${Math.round(result.oppositeConfidence * 100)}%)
@@ -243,7 +284,7 @@ function createClassificationCard(title, result, icon) {
 }
 
 // ===================================
-// RESULTS DISPLAY - BATCH PROCESSING
+// RESULTS DISPLAY - BATCH PROCESSING 
 // ===================================
 window.WildlifeAI.UIManager.displayBatchResults = function(batchResults) {
     console.log('📊 Displaying batch results:', {
@@ -287,8 +328,41 @@ window.WildlifeAI.UIManager.displayBatchResults = function(batchResults) {
                 ${summary.totalProcessed < summary.totalFiles ? `<div style="font-size: 0.9rem; margin-top: 5px; opacity: 0.8;">(${summary.totalFiles - summary.totalProcessed} failed to process)</div>` : ''}
             </div>
             
-            <div class="threshold-info">
-                <strong>Confidence Thresholds:</strong> High (80%+) | Medium (60-80%) | Low (<60%)
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px;">
+                <!-- Confidence Thresholds Info - Purple theme with color-coded levels -->
+                <div style="background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%); border: 2px solid #d8b4fe; border-radius: 16px; padding: 20px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+                    <div style="font-weight: 700; color: #7c3aed; margin-bottom: 12px; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        🎯 Confidence Thresholds
+                    </div>
+                    <div style="font-size: 0.95rem; line-height: 1.5;">
+                        <div style="margin-bottom: 6px;">
+                            <span style="background: #d4edda; color: #155724; padding: 4px 8px; border-radius: 6px; font-weight: 600;">High Confidence: 80%+</span>
+                        </div>
+                        <div style="margin-bottom: 6px;">
+                            <span style="background: #d1ecf1; color: #0c5460; padding: 4px 8px; border-radius: 6px; font-weight: 600;">Medium Confidence: 60-80%</span>
+                        </div>
+                        <div>
+                            <span style="background: #fff3cd; color: #856404; padding: 4px 8px; border-radius: 6px; font-weight: 600;">Low Confidence: Below 60%</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Color Legend Info - Gray theme (neutral) -->
+                <div style="background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%); border: 2px solid #d1d5db; border-radius: 16px; padding: 20px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+                    <div style="font-weight: 700; color: #374151; margin-bottom: 12px; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        🎨 Classification Colors
+                    </div>
+                    <div style="font-size: 0.95rem; line-height: 1.6;">
+                        <div style="margin-bottom: 8px;">
+                            <span class="label-positive" style="font-weight: 600; padding: 4px 8px; background: rgba(5, 150, 105, 0.1); border-radius: 6px;">Positive Cases</span>
+                        </div>
+                        <div style="font-size: 0.85rem; color: #374151; margin-bottom: 8px;">Domestic • Large • Mammal</div>
+                        <div style="margin-bottom: 8px;">
+                            <span class="label-negative" style="font-weight: 600; padding: 4px 8px; background: rgba(234, 88, 12, 0.1); border-radius: 6px;">Negative Cases</span>
+                        </div>
+                        <div style="font-size: 0.85rem; color: #374151;">Wild • Small • Non-Mammal</div>
+                    </div>
+                </div>
             </div>
             
             <div class="classification-breakdown">
