@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WildLife AI - Animal Classification System</title>
+    
+    <!-- External Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+    <script src="https://unpkg.com/ml5@latest/dist/ml5.min.js"></script>
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🦁 WildLife AI</h1>
+            <p>Advanced Animal Classification System for Conservation Research</p>
+        </div>
+
+        <div class="mode-selector">
+            <button class="mode-button active" id="singleModeBtn">📷 Single Image</button>
+            <button class="mode-button" id="batchModeBtn">📁 Batch Processing</button>
+        </div>
+        
+        <div class="main-content" id="mainContent">
+            <div class="upload-section">
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">📷</div>
+                    <div class="upload-text">Upload Animal Image</div>
+                    <div class="upload-subtext">Click here or drag & drop your image<br>Supports JPG, PNG, WebP formats</div>
+                </div>
+                <input type="file" id="imageUpload" accept="image/*" />
+                <input type="file" id="folderUpload" accept="image/*" multiple webkitdirectory directory />
+            </div>
+            
+            <div class="image-preview">
+                <div class="preview-header">
+                    <div class="preview-title">Image Preview</div>
+                </div>
+                <div id="image_container">
+                    <div id="placeholder" class="placeholder-content">
+                        <div style="font-size: 3rem; margin-bottom: 10px;">🖼️</div>
+                        <div>No image uploaded yet</div>
+                    </div>
+                    <button class="clear-button" id="clearBtn" title="Clear image">✕</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="results-section">
+            <div class="results-header">
+                <div class="results-title">🔍 Classification Results</div>
+                <div style="color: #666;">AI-powered animal identification with confidence thresholds</div>
+            </div>
+            
+            <div id="results">
+                <div class="loading" style="color: #666;">
+                    <div style="font-size: 2rem; margin-bottom: 15px;">🎯</div>
+                    <div>Upload an image to see classification results</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>🌍 Powered by Teachable Machine & ML5.js | Built for Wildlife Conservation Research</p>
+        </div>
+    </div>
+
+    <!-- Image zoom overlay -->
+    <div class="image-zoom-overlay" id="imageZoomOverlay">
+        <img id="zoomedImage" src="" alt="Zoomed view">
+    </div>
+
+    <!-- JavaScript - Load as regular scripts first, then initialise -->
+    <script src="js/config/constants.js"></script>
+    <script src="js/modules/utils.js"></script>
+    <script src="js/modules/classification.js"></script>
+    <script src="js/modules/imageHandler.js"></script>
+    <script src="js/modules/batchProcessor.js"></script>
+    <script src="js/modules/uiManager.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
