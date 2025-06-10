@@ -1,5 +1,5 @@
 // ===================================
-// utils.js WILDLIFE AI UTILS
+// WILDLIFE AI UTILS
 // ===================================
 
 window.WildlifeAI = window.WildlifeAI || {};
