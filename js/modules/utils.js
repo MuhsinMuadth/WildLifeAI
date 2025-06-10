@@ -1,5 +1,5 @@
 // ===================================
-// WILDLIFE AI UTILS
+// utils.js WILDLIFE AI UTILS
 // ===================================
 
 window.WildlifeAI = window.WildlifeAI || {};
@@ -62,6 +62,25 @@ window.WildlifeAI.Utils.formatClassificationText = function(result) {
             return `Subject is likely <span class="${labelColorClass}">${result.label}</span> (${percentage}%)`;
         default:
             return `Subject could be <span class="${labelColorClass}">${result.label}</span> (${percentage}%)`;
+    }
+};
+
+// ===================================
+// PLAIN TEXT FORMATTING FOR CSV EXPORT
+// ===================================
+window.WildlifeAI.Utils.formatClassificationTextPlain = function(result) {
+    if (!result) return 'Error';
+    
+    const level = window.WildlifeAI.Utils.getConfidenceLevel(result.confidence);
+    const percentage = Math.round(result.confidence * 100);
+    
+    switch(level) {
+        case 'is':
+            return `Subject is ${result.label} (${percentage}%)`;
+        case 'likely':
+            return `Subject is likely ${result.label} (${percentage}%)`;
+        default:
+            return `Subject could be ${result.label} (${percentage}%)`;
     }
 };
 
@@ -129,7 +148,8 @@ window.WildlifeAI.Utils.exportResultsToCSV = function(batchResults) {
             const size = result.classifications.size;
             const mammal = result.classifications.mammal;
             
-            const summary = `"${window.WildlifeAI.Utils.formatClassificationText(domestic)} | ${window.WildlifeAI.Utils.formatClassificationText(size)} | ${window.WildlifeAI.Utils.formatClassificationText(mammal)}"`;
+            // Use plain text formatting for CSV
+            const summary = `"${window.WildlifeAI.Utils.formatClassificationTextPlain(domestic)} | ${window.WildlifeAI.Utils.formatClassificationTextPlain(size)} | ${window.WildlifeAI.Utils.formatClassificationTextPlain(mammal)}"`;
             
             csvContent += `"${result.filename}",` +
                 `"${domestic.label}",${Math.round(domestic.confidence * 100)},` +
